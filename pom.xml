@@ -11,6 +11,7 @@
     <modules>
         <module>nstop-flow-engine</module>
         <module>nstop-common</module>
+        <module>nstop-biz</module>
     </modules>
 
     <properties>
@@ -27,7 +28,11 @@
                 <artifactId>mstop-common</artifactId>
                 <version>${nstop.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.nstop</groupId>
+                <artifactId>mstop-flow-engine</artifactId>
+                <version>${nstop.version}</version>
+            </dependency>
         </dependencies>
-
     </dependencyManagement>
 </project>

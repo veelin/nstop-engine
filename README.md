@@ -1,14 +1,14 @@
 # nstop-engine
 
 ## 功能概要
-![](readme/流程引擎功能概要.png)
+![](readme/png/流程引擎功能概要.png)
 
 ## 领域设计
-![](readme/领域设计.png)
+![](readme/png/领域设计.png)
 
 ## 迭代计划
 ### 迭代目标
-![](readme/低代码引擎迭代目标.png)
+![](readme/png/低代码引擎迭代目标.png)
 V0版本迭代中，有兴趣的朋友请前往Issue领取任务
 
 ### 迭代节奏

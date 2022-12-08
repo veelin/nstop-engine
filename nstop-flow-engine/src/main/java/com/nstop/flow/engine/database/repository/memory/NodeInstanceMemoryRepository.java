@@ -2,9 +2,10 @@ package com.nstop.flow.engine.database.repository.memory;
 
 import com.nstop.flow.engine.database.repository.NodeInstanceRepository;
 import com.nstop.flow.engine.entity.NodeInstancePO;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class NodeInstanceMemoryRepository implements NodeInstanceRepository {
 
 
