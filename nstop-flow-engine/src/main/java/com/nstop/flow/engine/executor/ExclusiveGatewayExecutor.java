@@ -1,7 +1,7 @@
 package com.nstop.flow.engine.executor;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.nstop.flow.engine.bo.HookInfoResponse;
 import com.nstop.flow.engine.bo.NodeInstanceBO;
 import com.nstop.flow.engine.common.Constants;

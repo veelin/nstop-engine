@@ -1,7 +1,7 @@
 package com.nstop.flow.engine.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.nstop.flow.engine.common.DataType;
 import com.nstop.flow.engine.model.InstanceData;
 import com.google.common.collect.Lists;

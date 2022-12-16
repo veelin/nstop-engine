@@ -1,7 +1,7 @@
 package com.nstop.flow.engine.processor;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import com.nstop.flow.engine.bo.*;
 import com.nstop.flow.engine.common.*;
 import com.nstop.flow.engine.database.adapter.InstanceDataRepositoryAdapter;
