@@ -13,11 +13,9 @@ import com.nstop.flow.engine.database.repository.InstanceDataRepository;
 import com.nstop.flow.engine.entity.InstanceDataPO;
 import com.nstop.flow.engine.exception.ProcessException;
 import com.nstop.flow.engine.model.FlowElement;
-import com.nstop.flow.engine.model.InstanceData;
 import com.nstop.flow.engine.util.FlowModelUtil;
 import com.nstop.flow.engine.util.HttpUtil;
 import com.nstop.flow.engine.util.InstanceDataUtil;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +54,7 @@ public class ExclusiveGatewayExecutor extends ElementExecutor {
         }
 
         //http post hook and get data result
-        Map<String, InstanceData> hookInfoValueMap = getHookInfoValueMap(runtimeContext.getFlowInstanceId(), hookInfoParam);
+        JSONObject hookInfoValueMap = getHookInfoValueMap(runtimeContext.getFlowInstanceId(), hookInfoParam);
         LOGGER.info("doExecute getHookInfoValueMap.||hookInfoValueMap={}", hookInfoValueMap);
         if (MapUtils.isEmpty(hookInfoValueMap)) {
             LOGGER.warn("doExecute: hookInfoValueMap is empty.||flowInstanceId={}||hookInfoParam={}||nodeKey={}",
@@ -65,7 +63,7 @@ public class ExclusiveGatewayExecutor extends ElementExecutor {
         }
 
         //merge data to current dataMap
-        Map<String, InstanceData> dataMap = runtimeContext.getInstanceDataMap();
+        JSONObject dataMap = runtimeContext.getInstanceDataMap();
         dataMap.putAll(hookInfoValueMap);
 
         //save data
@@ -75,12 +73,13 @@ public class ExclusiveGatewayExecutor extends ElementExecutor {
         }
     }
 
-    private Map<String, InstanceData> getHookInfoValueMap(String flowInstanceId, String hookInfoParam) {
+    private JSONObject getHookInfoValueMap(String flowInstanceId, String hookInfoParam) {
         //get hook config: url and timeout
         String hookUrl = hookProperties.getUrl();
+        JSONObject ret = new JSONObject();
         if (StringUtils.isBlank(hookUrl)) {
             LOGGER.info("getHookInfoValueMap: cannot find hookConfig.||flowInstanceId={}", flowInstanceId);
-            return MapUtils.EMPTY_MAP;
+            return ret;
         }
 
         Integer timeout = hookProperties.getTimeout();
@@ -99,31 +98,30 @@ public class ExclusiveGatewayExecutor extends ElementExecutor {
         if (hookInfoResponse == null || hookInfoResponse.getStatus() != 0) {
             LOGGER.warn("getHookInfoValueMap failed: hookInfoResponse is null." +
                     "||hookUrl={}||hookParamMap={}||responseStr={}", hookUrl, hookParamMap, responseStr);
-            return MapUtils.EMPTY_MAP;
+            return ret;
         }
 
         Map<String, Object> data = hookInfoResponse.getData();
         if (MapUtils.isEmpty(data)) {
             LOGGER.warn("getHookInfoValueMap failed: data is empty.||hookUrl={}||hookParamMap={}||responseStr={}",
                     hookUrl, hookParamMap, responseStr);
-            return MapUtils.EMPTY_MAP;
+            return ret;
         }
 
         String respFlowInstanceId = (String) data.get(PARAM_FLOW_INSTANCE_ID);
         if (!flowInstanceId.equals(respFlowInstanceId)) {
             LOGGER.warn("getHookInfoValueMap failed: flowInstanceId is not match." +
                     "||hookUrl={}||hookParamMap={}||responseStr={}", hookUrl, hookParamMap, responseStr);
-            return MapUtils.EMPTY_MAP;
+            return ret;
 
         }
 
-        List<InstanceData> dataList = Lists.newArrayList();
         JSONArray jsonArray = (JSONArray) data.get(PARAM_DATA_LIST);
         for (int i = 0; i < jsonArray.size(); i++) {
-            InstanceData instanceData = jsonArray.getObject(i, InstanceData.class);
-            dataList.add(instanceData);
+            Map instanceData = jsonArray.getObject(i, Map.class);
+            ret.put((String) instanceData.get("key"), instanceData.get("value"));
         }
-        return InstanceDataUtil.getInstanceDataMap(dataList);
+        return ret;
     }
 
     private String saveInstanceDataPO(RuntimeContext runtimeContext) {

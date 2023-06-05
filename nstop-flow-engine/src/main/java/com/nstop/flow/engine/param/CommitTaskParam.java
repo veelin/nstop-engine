@@ -1,18 +1,18 @@
 package com.nstop.flow.engine.param;
 
-import com.nstop.flow.engine.model.InstanceData;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.MoreObjects;
 
 import java.util.List;
 
 public class CommitTaskParam extends RuntimeTaskParam {
-    private List<InstanceData> variables;
+    private JSONObject variables;
 
-    public List<InstanceData> getVariables() {
+    public JSONObject getVariables() {
         return variables;
     }
 
-    public void setVariables(List<InstanceData> variables) {
+    public void setVariables(JSONObject variables) {
         this.variables = variables;
     }
 

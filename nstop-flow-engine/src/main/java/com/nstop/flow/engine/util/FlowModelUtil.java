@@ -58,7 +58,8 @@ public class FlowModelUtil {
      */
     public static FlowElement getStartEvent(Map<String, FlowElement> flowModel) {
         for (FlowElement flowElement : flowModel.values()) {
-            if (FlowElementType.START_EVENT == flowElement.getType()) {
+            if (FlowElementType.START_EVENT.equals(flowElement.getType())
+                || FlowElementType.HTTP_START_EVENT.equals(flowElement.getType())) {
                 return flowElement;
             }
         }
@@ -109,8 +110,7 @@ public class FlowModelUtil {
 
     public static boolean isDefaultCondition(FlowElement flowElement) {
         Map<String, Object> properties = flowElement.getProperties();
-        String isDefaultStr = (String) properties.get(Constants.ELEMENT_PROPERTIES.DEFAULT_CONDITION);
-        return "true".equalsIgnoreCase(isDefaultStr);
+        return (Boolean)properties.get(Constants.ELEMENT_PROPERTIES.DEFAULT_CONDITION);
     }
 
     public static String getHookInfos(FlowElement flowElement) {
@@ -118,16 +118,16 @@ public class FlowModelUtil {
         return (String) properties.get(Constants.ELEMENT_PROPERTIES.HOOK_INFO_IDS);
     }
 
-    public static int getElementType(String elementKey, Map<String, FlowElement> flowElementMap) {
+    public static String getElementType(String elementKey, Map<String, FlowElement> flowElementMap) {
         FlowElement flowElement = flowElementMap.get(elementKey);
         if (flowElement != null) {
             return flowElement.getType();
         }
-        return -1;
+        return null;
     }
 
-    public static boolean isElementType(String elementKey, Map<String, FlowElement> flowElementMap, int targetElementType) {
-        int sourceElementType = getElementType(elementKey, flowElementMap);
+    public static boolean isElementType(String elementKey, Map<String, FlowElement> flowElementMap, String targetElementType) {
+        String sourceElementType = getElementType(elementKey, flowElementMap);
         return sourceElementType == targetElementType;
     }
 

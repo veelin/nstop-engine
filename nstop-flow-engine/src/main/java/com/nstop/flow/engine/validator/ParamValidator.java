@@ -47,7 +47,7 @@ public class ParamValidator {
         if (getFlowModuleParam == null) {
             throw new ParamException(ErrorEnum.PARAM_INVALID.getErrNo(), "param is null");
         }
-        if (StringUtils.isBlank(getFlowModuleParam.getFlowModuleId()) && StringUtils.isBlank(getFlowModuleParam.getFlowDeployId())) {
+        if (StringUtils.isBlank(getFlowModuleParam.getFlowModuleId()) && StringUtils.isBlank(getFlowModuleParam.getFlowDeployId()) && StringUtils.isBlank(getFlowModuleParam.getFlowKey())) {
             throw new ParamException(ErrorEnum.PARAM_INVALID.getErrNo(), "flowDeployId and flowModuleId is blank");
         }
     }

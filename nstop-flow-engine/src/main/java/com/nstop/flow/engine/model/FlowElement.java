@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class FlowElement {
     private String key; // 流程内元素唯一key resourceId
-    private int type; // stencil 类型
+    private String type; // stencil 类型
     private List<String> outgoing;
     private Map<String, Object> properties; // 配置属性
     private List<String> incoming;
@@ -20,11 +20,11 @@ public class FlowElement {
         this.key = key;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

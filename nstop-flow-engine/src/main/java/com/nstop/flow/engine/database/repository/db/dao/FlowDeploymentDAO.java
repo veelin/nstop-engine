@@ -35,4 +35,8 @@ public class FlowDeploymentDAO extends BaseDAO<FlowDeploymentMapper, FlowDeploym
     public FlowDeploymentPO selectRecentByFlowModuleId(String flowModuleId) {
         return baseMapper.selectByModuleId(flowModuleId);
     }
+
+    public FlowDeploymentPO selectRecentByFlowType(String flowType, String flowKey) {
+        return baseMapper.selectByFlowType(flowType, flowKey);
+    }
 }

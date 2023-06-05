@@ -10,6 +10,7 @@ public class FlowDeploymentPO extends OperationPO {
     private String flowKey;
     private String flowModel;
     private Integer status;
+    private String flowType;
 
     public String getFlowDeployId() {
         return flowDeployId;
@@ -58,4 +59,13 @@ public class FlowDeploymentPO extends OperationPO {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
+
 }

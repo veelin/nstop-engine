@@ -74,6 +74,9 @@ public interface ProcessEngine {
      */
     StartProcessResult startProcess(StartProcessParam startProcessParam);
 
+
+    DebugResult debugProcess(StartProcessParam startProcessParam);
+
     /**
      * Commit suspended userTask of the flow instance previously created specified by flowInstanceId and continue to process.
      *

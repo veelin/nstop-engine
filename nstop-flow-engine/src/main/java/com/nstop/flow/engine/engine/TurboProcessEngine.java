@@ -44,6 +44,11 @@ public class TurboProcessEngine implements ProcessEngine {
     }
 
     @Override
+    public DebugResult debugProcess(StartProcessParam startProcessParam) {
+        return runtimeProcessor.debugProcess(startProcessParam);
+    }
+
+    @Override
     public CommitTaskResult commitTask(CommitTaskParam commitTaskParam) {
         return runtimeProcessor.commit(commitTaskParam);
     }

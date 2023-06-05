@@ -1,7 +1,7 @@
 package com.nstop.biz.test;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nstop.flow.engine.engine.TurboProcessEngine;
-import com.nstop.flow.engine.model.InstanceData;
 import com.nstop.flow.engine.param.*;
 import com.nstop.flow.engine.result.*;
 import org.slf4j.Logger;
@@ -88,8 +88,8 @@ public class LeaveServiceImpl {
     private StartProcessResult startProcess() {
         StartProcessParam startProcessParam = new StartProcessParam();
         startProcessParam.setFlowDeployId(deployFlowResult.getFlowDeployId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("user_name", "请假人名字"));
+        JSONObject variables = new JSONObject();
+        variables.put("user_name", "请假人名字");
         startProcessParam.setVariables(variables);
         StartProcessResult startProcessResult = turboProcessEngine.startProcess(startProcessParam);
 
@@ -102,9 +102,9 @@ public class LeaveServiceImpl {
         CommitTaskParam commitTaskParam = new CommitTaskParam();
         commitTaskParam.setFlowInstanceId(startProcessResult.getFlowInstanceId());
         commitTaskParam.setTaskInstanceId(startProcessResult.getActiveTaskInstance().getNodeInstanceId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("user_name", "请假人名字"));
-        variables.add(new InstanceData("n", 1));
+        JSONObject variables = new JSONObject();
+        variables.put("user_name", "请假人名字");
+        variables.put("n", 1);
         commitTaskParam.setVariables(variables);
 
         CommitTaskResult commitTaskResult = turboProcessEngine.commitTask(commitTaskParam);
@@ -128,9 +128,9 @@ public class LeaveServiceImpl {
         CommitTaskParam commitTaskParam = new CommitTaskParam();
         commitTaskParam.setFlowInstanceId(rollbackTaskResult.getFlowInstanceId());
         commitTaskParam.setTaskInstanceId(rollbackTaskResult.getActiveTaskInstance().getNodeInstanceId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("user_name", "请假人名字"));
-        variables.add(new InstanceData("n", 2));
+        JSONObject variables = new JSONObject();
+        variables.put("user_name", "请假人名字");
+        variables.put("n", 1);
         commitTaskParam.setVariables(variables);
 
         CommitTaskResult commitTaskResult = turboProcessEngine.commitTask(commitTaskParam);
@@ -143,9 +143,9 @@ public class LeaveServiceImpl {
         CommitTaskParam commitTaskParam = new CommitTaskParam();
         commitTaskParam.setFlowInstanceId(commitTaskResult.getFlowInstanceId());
         commitTaskParam.setTaskInstanceId(commitTaskResult.getActiveTaskInstance().getNodeInstanceId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("user_name", "请假人名字"));
-        variables.add(new InstanceData("n", 4));
+        JSONObject variables = new JSONObject();
+        variables.put("user_name", "请假人名字");
+        variables.put("n", 1);
         commitTaskParam.setVariables(variables);
 
         CommitTaskResult result = turboProcessEngine.commitTask(commitTaskParam);

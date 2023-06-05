@@ -19,7 +19,7 @@ public class GroovyExpressionCalculator implements ExpressionCalculator {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroovyExpressionCalculator.class);
 
     @Override
-    public Boolean calculate(String expression, Map<String, Object> dataMap) throws ProcessException {
+    public Boolean calculate(String expression, JSONObject dataMap) throws ProcessException {
         if (expression.startsWith("${") && expression.endsWith("}")) {
             expression = expression.substring(2, expression.length() - 1);
         }

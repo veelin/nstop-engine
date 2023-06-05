@@ -1,7 +1,7 @@
 package com.nstop.biz.test;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nstop.flow.engine.engine.ProcessEngine;
-import com.nstop.flow.engine.model.InstanceData;
 import com.nstop.flow.engine.param.*;
 import com.nstop.flow.engine.result.*;
 import org.slf4j.Logger;
@@ -91,8 +91,8 @@ public class AfterSaleServiceImpl {
     private StartProcessResult startProcess() {
         StartProcessParam startProcessParam = new StartProcessParam();
         startProcessParam.setFlowDeployId(deployFlowResult.getFlowDeployId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("user_id", "userId"));
+        JSONObject variables = new JSONObject();
+        variables.put("user_id", "userId");
         startProcessParam.setVariables(variables);
         StartProcessResult startProcessResult = processEngine.startProcess(startProcessParam);
 
@@ -105,9 +105,9 @@ public class AfterSaleServiceImpl {
         CommitTaskParam commitTaskParam = new CommitTaskParam();
         commitTaskParam.setFlowInstanceId(startProcessResult.getFlowInstanceId());
         commitTaskParam.setTaskInstanceId(startProcessResult.getActiveTaskInstance().getNodeInstanceId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("order_id", "orderID"));
-        variables.add(new InstanceData("status", "0"));
+        JSONObject variables = new JSONObject();
+        variables.put("order_id", "orderID");
+        variables.put("status", "0");
         commitTaskParam.setVariables(variables);
 
         CommitTaskResult commitTaskResult = processEngine.commitTask(commitTaskParam);
@@ -131,9 +131,9 @@ public class AfterSaleServiceImpl {
         CommitTaskParam commitTaskParam = new CommitTaskParam();
         commitTaskParam.setFlowInstanceId(rollbackTaskResult.getFlowInstanceId());
         commitTaskParam.setTaskInstanceId(rollbackTaskResult.getActiveTaskInstance().getNodeInstanceId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("order_id", "orderID"));
-        variables.add(new InstanceData("status", "1"));
+        JSONObject variables = new JSONObject();
+        variables.put("order_id", "orderID");
+        variables.put("status", "1");
         commitTaskParam.setVariables(variables);
 
         CommitTaskResult commitTaskResult = processEngine.commitTask(commitTaskParam);
@@ -146,9 +146,9 @@ public class AfterSaleServiceImpl {
         CommitTaskParam commitTaskParam = new CommitTaskParam();
         commitTaskParam.setFlowInstanceId(commitTaskResult.getFlowInstanceId());
         commitTaskParam.setTaskInstanceId(commitTaskResult.getActiveTaskInstance().getNodeInstanceId());
-        List<InstanceData> variables = new ArrayList<>();
-        variables.add(new InstanceData("order_id", "orderID"));
-        variables.add(new InstanceData("status", "2"));
+        JSONObject variables = new JSONObject();
+        variables.put("order_id", "orderID");
+        variables.put("status", "2");
         commitTaskParam.setVariables(variables);
 
         CommitTaskResult result = processEngine.commitTask(commitTaskParam);

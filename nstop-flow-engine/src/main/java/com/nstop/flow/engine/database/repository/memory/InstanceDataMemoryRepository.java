@@ -19,6 +19,6 @@ public class InstanceDataMemoryRepository implements InstanceDataRepository {
 
     @Override
     public int insert(InstanceDataPO instanceDataPO) {
-        return 0;
+        return 1;
     }
 }

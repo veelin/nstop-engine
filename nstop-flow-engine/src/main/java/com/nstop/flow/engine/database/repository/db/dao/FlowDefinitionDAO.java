@@ -68,4 +68,18 @@ public class FlowDefinitionDAO extends BaseDAO<FlowDefinitionMapper, FlowDefinit
         }
         return null;
     }
+
+
+    public FlowDefinitionPO selectByFlowKey(String flowType, String flowKey) {
+        if (StringUtils.isBlank(flowKey)) {
+            LOGGER.warn("getById failed: flowKey is empty.");
+            return null;
+        }
+        try {
+            return baseMapper.selectByFlowKey(flowType, flowKey);
+        } catch (Exception e) {
+            LOGGER.error("selectByFlowKey exception.||flowType={}|| flowKey={}", flowType,flowKey, e);
+        }
+        return null;
+    }
 }

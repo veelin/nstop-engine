@@ -1,6 +1,6 @@
 package com.nstop.flow.engine.param;
 
-import com.nstop.flow.engine.model.InstanceData;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.MoreObjects;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public class StartProcessParam {
     private String flowModuleId;
     private String flowDeployId;
-    private List<InstanceData> variables;
+    private JSONObject variables;
 
     public String getFlowModuleId() {
         return flowModuleId;
@@ -26,11 +26,11 @@ public class StartProcessParam {
         this.flowDeployId = flowDeployId;
     }
 
-    public List<InstanceData> getVariables() {
+    public JSONObject getVariables() {
         return variables;
     }
 
-    public void setVariables(List<InstanceData> variables) {
+    public void setVariables(JSONObject variables) {
         this.variables = variables;
     }
 

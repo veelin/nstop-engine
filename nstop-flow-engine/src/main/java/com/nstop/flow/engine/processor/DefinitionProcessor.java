@@ -121,7 +121,9 @@ public class DefinitionProcessor {
             String flowDeployId = idGenerator.getNextId();
             flowDeploymentPO.setFlowDeployId(flowDeployId);
             flowDeploymentPO.setStatus(FlowDeploymentStatus.DEPLOYED);
-
+            if (flowDeploymentPO.getId() != null) {
+                flowDeploymentPO.setId(null);
+            }
             int rows = flowDeploymentDAO.insert(flowDeploymentPO);
             if (rows != 1) {
                 LOGGER.warn("deploy flow failed: insert to db failed.||deployFlowParam={}", deployFlowParam);
@@ -144,8 +146,10 @@ public class DefinitionProcessor {
             String flowDeployId = getFlowModuleParam.getFlowDeployId();
             if (StringUtils.isNotBlank(flowDeployId)) {
                 flowModuleResult = getFlowModuleByFlowDeployId(flowDeployId);
-            } else {
+            } else if (StringUtils.isNotBlank(getFlowModuleParam.getFlowModuleId())) {
                 flowModuleResult = getFlowModuleByFlowModuleId(flowModuleId);
+            } else {
+                flowModuleResult = getFlowModuleByFlowType(getFlowModuleParam.getFlowType(), getFlowModuleParam.getFlowKey(), getFlowModuleParam.isDebug());
             }
             fillCommonResult(flowModuleResult, ErrorEnum.SUCCESS);
         } catch (TurboException te) {
@@ -182,6 +186,35 @@ public class DefinitionProcessor {
         return flowModuleResult;
     }
 
+    private FlowModuleResult getFlowModuleByFlowType(String flowType, String flowKey, boolean isDebug) throws ParamException {
+        FlowModuleResult flowModuleResult = new FlowModuleResult();
+
+        if (!isDebug) {
+            FlowDeploymentPO flowDeploymentPO = flowDeploymentDAO.selectRecentByFlowType(flowType, flowKey);
+            if (flowDeploymentPO == null) {
+                LOGGER.warn("getFlowModuleByFlowDeployId failed: can not find flowDefinitionPO.||flowType={}||flowKey={}", flowType, flowKey);
+                throw new ParamException(ErrorEnum.PARAM_INVALID.getErrNo(), "flowDefinitionPO is not exist");
+            }
+            BeanUtils.copyProperties(flowDeploymentPO, flowModuleResult);
+            Integer status = FlowModuleEnum.getStatusByDeploymentStatus(flowDeploymentPO.getStatus());
+            flowModuleResult.setStatus(status);
+        } else {
+            FlowDefinitionPO flowDefinitionPO = flowDefinitionDAO.selectByFlowKey(flowType, flowKey);
+            if (flowDefinitionPO == null) {
+                LOGGER.warn("getFlowModuleByFlowDeployId failed: can not find flowDefinitionPO.||flowType={}||flowKey={}", flowType, flowKey);
+                throw new ParamException(ErrorEnum.PARAM_INVALID.getErrNo(), "flowDefinitionPO is not exist");
+            }
+            BeanUtils.copyProperties(flowDefinitionPO, flowModuleResult);
+            Integer status = FlowModuleEnum.getStatusByDeploymentStatus(flowDefinitionPO.getStatus());
+            flowModuleResult.setStatus(status);
+        }
+
+        LOGGER.info("getFlowModuleByFlowType||flowType={}||flowKey={}||response={}", flowType, flowKey, JSON.toJSONString(flowModuleResult));
+        return flowModuleResult;
+
+
+    }
+
     private void fillCommonResult(CommonResult commonResult, ErrorEnum errorEnum) {
         fillCommonResult(commonResult, errorEnum.getErrNo(), errorEnum.getErrMsg());
     }
@@ -191,7 +224,7 @@ public class DefinitionProcessor {
     }
 
     private void fillCommonResult(CommonResult commonResult, int errNo, String errMsg) {
-        commonResult.setErrCode(errNo);
-        commonResult.setErrMsg(errMsg);
+        commonResult.setCode(errNo);
+        commonResult.setMessage(errMsg);
     }
 }

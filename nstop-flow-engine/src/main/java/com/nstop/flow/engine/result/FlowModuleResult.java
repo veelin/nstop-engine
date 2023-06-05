@@ -10,6 +10,7 @@ public class FlowModuleResult extends CommonResult {
     private String flowKey;
     private String flowModel;
     private Integer status;
+    private String flowType;
     private String remark;
     private String tenant;
     private String caller;
@@ -96,11 +97,19 @@ public class FlowModuleResult extends CommonResult {
         this.modifyTime = modifyTime;
     }
 
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("errCode", getErrCode())
-                .add("errMsg", getErrMsg())
+                .add("errCode", getCode())
+                .add("errMsg", getMessage())
                 .add("flowModuleId", flowModuleId)
                 .add("flowName", flowName)
                 .add("flowKey", flowKey)

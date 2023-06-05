@@ -1,25 +1,21 @@
 package com.nstop.flow.engine.processor;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.nstop.flow.engine.bo.*;
 import com.nstop.flow.engine.common.*;
 import com.nstop.flow.engine.database.adapter.InstanceDataRepositoryAdapter;
 import com.nstop.flow.engine.database.adapter.NodeInstanceRepositoryAdapter;
 import com.nstop.flow.engine.database.repository.InstanceDataRepository;
 import com.nstop.flow.engine.database.repository.NodeInstanceRepository;
+import com.nstop.flow.engine.database.repository.db.dao.FlowDefinitionDAO;
 import com.nstop.flow.engine.database.repository.db.dao.FlowDeploymentDAO;
 import com.nstop.flow.engine.database.repository.db.dao.ProcessInstanceDAO;
-import com.nstop.flow.engine.entity.FlowDeploymentPO;
-import com.nstop.flow.engine.entity.FlowInstancePO;
-import com.nstop.flow.engine.entity.InstanceDataPO;
-import com.nstop.flow.engine.entity.NodeInstancePO;
+import com.nstop.flow.engine.entity.*;
 import com.nstop.flow.engine.exception.ProcessException;
 import com.nstop.flow.engine.exception.ReentrantException;
 import com.nstop.flow.engine.exception.TurboException;
 import com.nstop.flow.engine.executor.FlowExecutor;
 import com.nstop.flow.engine.model.FlowElement;
-import com.nstop.flow.engine.model.InstanceData;
 import com.nstop.flow.engine.param.CommitTaskParam;
 import com.nstop.flow.engine.param.RollbackTaskParam;
 import com.nstop.flow.engine.param.StartProcessParam;
@@ -48,6 +44,9 @@ public class RuntimeProcessor {
 
     @Resource
     private FlowDeploymentDAO flowDeploymentDAO;
+
+    @Resource
+    private FlowDefinitionDAO flowDefinitionDAO;
 
     @Resource
     private ProcessInstanceDAO processInstanceDAO;
@@ -89,11 +88,43 @@ public class RuntimeProcessor {
         }
     }
 
+    public DebugResult debugProcess(StartProcessParam startProcessParam) {
+        RuntimeContext runtimeContext = null;
+        try {
+            //1.param validate
+            ParamValidator.validate(startProcessParam);
+
+            //2.getFlowInfo
+            FlowInfo flowInfo = getDebugFlowInfo(startProcessParam);
+
+            //3.init context for runtime
+            runtimeContext = buildDebugProcessContext(flowInfo, startProcessParam.getVariables());
+
+            //4.process
+            flowExecutor.execute(runtimeContext);
+
+            //5.build result
+            return buildDebugResult(runtimeContext, null);
+        } catch (Exception e) {
+                LOGGER.error("startProcess ProcessException.||startProcessParam={}||runtimeContext={}, ",
+                        startProcessParam, runtimeContext, e);
+            return buildDebugResult(runtimeContext, e);
+        }
+    }
+
+
     private FlowInfo getFlowInfo(StartProcessParam startProcessParam) throws ProcessException {
         if (StringUtils.isNotBlank(startProcessParam.getFlowDeployId())) {
             return getFlowInfoByFlowDeployId(startProcessParam.getFlowDeployId());
         } else {
             return getFlowInfoByFlowModuleId(startProcessParam.getFlowModuleId());
+        }
+    }
+    private FlowInfo getDebugFlowInfo(StartProcessParam startProcessParam) throws ProcessException {
+        if (StringUtils.isNotBlank(startProcessParam.getFlowDeployId())) {
+            return getFlowInfoByFlowDeployId(startProcessParam.getFlowDeployId());
+        } else {
+            return getDebugFlowInfoByFlowModuleId(startProcessParam.getFlowModuleId());
         }
     }
 
@@ -102,8 +133,14 @@ public class RuntimeProcessor {
      * 1.flowInfo: flowDeployId, flowModuleId, tenantId, flowModel(FlowElementList)
      * 2.variables: inputDataList fr. param
      */
-    private RuntimeContext buildStartProcessContext(FlowInfo flowInfo, List<InstanceData> variables) {
+    private RuntimeContext buildStartProcessContext(FlowInfo flowInfo, JSONObject variables) {
         return buildRuntimeContext(flowInfo, variables);
+    }
+
+    private RuntimeContext buildDebugProcessContext(FlowInfo flowInfo, JSONObject variables) {
+        RuntimeContext runtimeContext = buildRuntimeContext(flowInfo, variables);
+        InstanceDataUtil.putValue(runtimeContext.getInstanceDataMap(), Constants.ENGINE_TYPE_DATA_KEY, EngineTypeEnum.instant.name());
+        return runtimeContext;
     }
 
     private StartProcessResult buildStartProcessResult(RuntimeContext runtimeContext) {
@@ -116,6 +153,27 @@ public class RuntimeProcessor {
         StartProcessResult startProcessResult = new StartProcessResult();
         BeanUtils.copyProperties(runtimeContext, startProcessResult);
         return (StartProcessResult) fillRuntimeResult(startProcessResult, runtimeContext, e);
+    }
+
+    private DebugResult buildDebugResult(RuntimeContext runtimeContext, Exception e) {
+        DebugResult debugResult = new DebugResult();
+        BeanUtils.copyProperties(runtimeContext, debugResult);
+        if (e != null) {
+            debugResult.setCode(ErrorEnum.SYSTEM_ERROR.getErrNo());
+            debugResult.setMessage(ErrorEnum.SYSTEM_ERROR.getErrMsg());
+        }else {
+            debugResult.setCode(ErrorEnum.SUCCESS.getErrNo());
+            debugResult.setMessage(ErrorEnum.SUCCESS.getErrMsg());
+        }
+
+        if (runtimeContext != null) {
+            debugResult.setFlowInstanceId(runtimeContext.getFlowInstanceId());
+            debugResult.setStatus(runtimeContext.getFlowInstanceStatus());
+            debugResult.setActiveTaskInstance(buildActiveTaskInstance(runtimeContext.getSuspendNodeInstance(), runtimeContext));
+            debugResult.setVariables(runtimeContext.getInstanceDataMap());
+        }
+        debugResult.setException(e);
+        return debugResult;
     }
 
     ////////////////////////////////////////commit////////////////////////////////////////
@@ -344,8 +402,8 @@ public class RuntimeProcessor {
                 userTaskList.add(nodeInstance);
             }
         } catch (ProcessException e) {
-            historyListResult.setErrCode(e.getErrNo());
-            historyListResult.setErrMsg(e.getErrMsg());
+            historyListResult.setCode(e.getErrNo());
+            historyListResult.setMessage(e.getErrMsg());
         }
         return historyListResult;
     }
@@ -367,7 +425,7 @@ public class RuntimeProcessor {
             throw new ProcessException(ErrorEnum.GET_NODE_FAILED);
         }
         FlowElement flowElement = flowElementMap.get(nodeKey);
-        return flowElement.getType() == FlowElementType.USER_TASK;
+        return FlowElementType.USER_TASK.equals(flowElement.getType());
     }
 
     ////////////////////////////////////////getHistoryElementList////////////////////////////////////////
@@ -420,8 +478,8 @@ public class RuntimeProcessor {
                 elementInstanceList.add(nodeInstance);
             }
         } catch (ProcessException e) {
-            elementInstanceListResult.setErrCode(e.getErrNo());
-            elementInstanceListResult.setErrMsg(e.getErrMsg());
+            elementInstanceListResult.setCode(e.getErrNo());
+            elementInstanceListResult.setMessage(e.getErrMsg());
         }
         return elementInstanceListResult;
     }
@@ -454,11 +512,11 @@ public class RuntimeProcessor {
                 nodeInstance.setProperties(Maps.newHashMap());
             }
             nodeInstanceResult.setNodeInstance(nodeInstance);
-            nodeInstanceResult.setErrCode(ErrorEnum.SUCCESS.getErrNo());
-            nodeInstanceResult.setErrMsg(ErrorEnum.SUCCESS.getErrMsg());
+            nodeInstanceResult.setCode(ErrorEnum.SUCCESS.getErrNo());
+            nodeInstanceResult.setMessage(ErrorEnum.SUCCESS.getErrMsg());
         } catch (ProcessException e) {
-            nodeInstanceResult.setErrCode(e.getErrNo());
-            nodeInstanceResult.setErrMsg(e.getErrMsg());
+            nodeInstanceResult.setCode(e.getErrNo());
+            nodeInstanceResult.setMessage(e.getErrMsg());
         }
         return nodeInstanceResult;
     }
@@ -467,16 +525,8 @@ public class RuntimeProcessor {
     public InstanceDataListResult getInstanceData(String engineType, String flowInstanceId) {
         InstanceDataRepository instanceDataRepository = instanceDataRepositoryAdapter.find(engineType);
         InstanceDataPO instanceDataPO = instanceDataRepository.selectRecentOne(flowInstanceId);
-
-        TypeReference<List<InstanceData>> typeReference = new TypeReference<List<InstanceData>>() {
-        };
-        List<InstanceData> instanceDataList = JSONObject.parseObject(instanceDataPO.getInstanceData(), typeReference);
-        if (CollectionUtils.isEmpty(instanceDataList)) {
-            instanceDataList =  Lists.newArrayList();
-        }
-
         InstanceDataListResult instanceDataListResult = new InstanceDataListResult(ErrorEnum.SUCCESS);
-        instanceDataListResult.setVariables(instanceDataList);
+        instanceDataListResult.setVariables(JSONObject.parseObject(instanceDataPO.getInstanceData()));
         return instanceDataListResult;
     }
 
@@ -509,6 +559,19 @@ public class RuntimeProcessor {
         return flowInfo;
     }
 
+    private FlowInfo getDebugFlowInfoByFlowModuleId(String flowModuleId) throws ProcessException {
+        //get from db directly
+        FlowDefinitionPO flowDefinitionPO = flowDefinitionDAO.selectByModuleId(flowModuleId);
+        if (flowDefinitionPO == null) {
+            LOGGER.warn("getDebugFlowInfoByFlowModuleId failed.||flowModuleId={}", flowModuleId);
+            throw new ProcessException(ErrorEnum.GET_FLOW_DEPLOYMENT_FAILED);
+        }
+
+        FlowInfo flowInfo = new FlowInfo();
+        BeanUtils.copyProperties(flowDefinitionPO, flowInfo);
+
+        return flowInfo;
+    }
     private FlowInstanceBO getFlowInstanceBO(String flowInstanceId) throws ProcessException {
         //get from db
         FlowInstancePO flowInstancePO = processInstanceDAO.selectByFlowInstanceId(flowInstanceId);
@@ -529,10 +592,9 @@ public class RuntimeProcessor {
         return runtimeContext;
     }
 
-    private RuntimeContext buildRuntimeContext(FlowInfo flowInfo, List<InstanceData> variables) {
+    private RuntimeContext buildRuntimeContext(FlowInfo flowInfo, JSONObject variables) {
         RuntimeContext runtimeContext = buildRuntimeContext(flowInfo);
-        Map<String, InstanceData> instanceDataMap = InstanceDataUtil.getInstanceDataMap(variables);
-        runtimeContext.setInstanceDataMap(instanceDataMap);
+        runtimeContext.setInstanceDataMap(variables);
         return runtimeContext;
     }
 
@@ -552,14 +614,14 @@ public class RuntimeProcessor {
     }
 
     private RuntimeResult fillRuntimeResult(RuntimeResult runtimeResult, RuntimeContext runtimeContext, int errNo, String errMsg) {
-        runtimeResult.setErrCode(errNo);
-        runtimeResult.setErrMsg(errMsg);
+        runtimeResult.setCode(errNo);
+        runtimeResult.setMessage(errMsg);
 
         if (runtimeContext != null) {
             runtimeResult.setFlowInstanceId(runtimeContext.getFlowInstanceId());
             runtimeResult.setStatus(runtimeContext.getFlowInstanceStatus());
             runtimeResult.setActiveTaskInstance(buildActiveTaskInstance(runtimeContext.getSuspendNodeInstance(), runtimeContext));
-            runtimeResult.setVariables(InstanceDataUtil.getInstanceDataList(runtimeContext.getInstanceDataMap()));
+            runtimeResult.setVariables(runtimeContext.getInstanceDataMap());
         }
         return runtimeResult;
     }

@@ -6,6 +6,7 @@ public class CreateFlowParam extends OperationParam {
     private String flowKey;
     private String flowName;
     private String remark;
+    private String flowType;
 
     public CreateFlowParam(String tenant, String caller) {
         super(tenant, caller);
@@ -33,6 +34,14 @@ public class CreateFlowParam extends OperationParam {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
     }
 
     @Override
