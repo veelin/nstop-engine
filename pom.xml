@@ -19,6 +19,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <nstop.version>1.0-SNAPSHOT</nstop.version>
+        <spring.boot.starter.verison>2.7.6</spring.boot.starter.verison>
     </properties>
 
     <dependencyManagement>
@@ -32,6 +33,17 @@
                 <groupId>com.nstop</groupId>
                 <artifactId>mstop-flow-engine</artifactId>
                 <version>${nstop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.starter.verison}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring.boot.starter.verison}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
