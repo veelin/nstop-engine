@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    dynamic:
+      primary: engine
+      datasource:
+        engine:
+          type: com.alibaba.druid.pool.DruidDataSource
+          username: sweet
+          password: mesCAV4oY7y90qt7D1eWRrwwxU0IeHb!
+          driver-class-name: com.mysql.jdbc.Driver
+          url: jdbc:mysql://127.0.0.1:3306/t_engine?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&autoReconnect=true
+  main:
+    allow-bean-definition-overriding: true
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  config: logback-spring.xml
+hook:
+  url: http://127.0.0.1:8031/globalInfo/refresh
+  timeout: 3000
+
+nstop-engine:
+  datasource:
+    mysql:
+      db1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        username: sweet
+        password: mesCAV4oY7y90qt7D1eWRrwwxU0IeHb!
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/t_engine?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&autoReconnect=true
+      db2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        username: sweet
+        password: mesCAV4oY7y90qt7D1eWRrwwxU0IeHb!
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/t_engine?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&autoReconnect=true
