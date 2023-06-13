@@ -56,11 +56,13 @@ public class FlowModelValidator {
             ElementValidator elementValidator = elementValidatorFactory.getElementValidator(flowElement);
             elementValidator.validate(flowElementMap, flowElement);
 
-            if (FlowElementType.START_EVENT == flowElement.getType()) {
+            if (FlowElementType.START_EVENT.equals(flowElement.getType())
+                    ||FlowElementType.HTTP_START_EVENT.equals(flowElement.getType())) {
                 startEventCount++;
             }
 
-            if (FlowElementType.END_EVENT == flowElement.getType()) {
+            if (FlowElementType.END_EVENT.equals(flowElement.getType())
+                    ||FlowElementType.HTTP_END_EVENT.equals(flowElement.getType())) {
                 endEventCount++;
             }
         }

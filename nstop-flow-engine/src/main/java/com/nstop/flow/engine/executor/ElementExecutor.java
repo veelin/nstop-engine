@@ -1,5 +1,6 @@
 package com.nstop.flow.engine.executor;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nstop.flow.engine.bo.NodeInstanceBO;
 import com.nstop.flow.engine.common.ErrorEnum;
 import com.nstop.flow.engine.common.FlowElementType;
@@ -13,12 +14,13 @@ import com.nstop.flow.engine.exception.ProcessException;
 import com.nstop.flow.engine.exception.ReentrantException;
 import com.nstop.flow.engine.exception.SuspendException;
 import com.nstop.flow.engine.model.FlowElement;
-import com.nstop.flow.engine.model.InstanceData;
 import com.nstop.flow.engine.util.ExpressionCalculator;
 import com.nstop.flow.engine.util.FlowModelUtil;
 import com.nstop.flow.engine.util.InstanceDataUtil;
+import com.nstop.flow.engine.util.impl.GroovyExpressionCalculator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -26,8 +28,8 @@ import java.util.Map;
 
 public abstract class ElementExecutor extends RuntimeExecutor {
 
-    @Resource
-    protected ExpressionCalculator expressionCalculator;
+    @Autowired
+    protected GroovyExpressionCalculator expressionCalculator;
 
     @Override
     public void execute(RuntimeContext runtimeContext) throws ProcessException {
@@ -180,7 +182,7 @@ public abstract class ElementExecutor extends RuntimeExecutor {
             runtimeContext.setInstanceDataId(currentInstanceDataId);
             InstanceDataRepository instanceDataRepository = instanceDataRepositoryAdapter.find(runtimeContext);
             InstanceDataPO instanceDataPO = instanceDataRepository.select(flowInstanceId, currentInstanceDataId);
-            Map<String, InstanceData> currentInstanceDataMap = InstanceDataUtil.getInstanceDataMap(instanceDataPO.getInstanceData());
+            JSONObject currentInstanceDataMap = InstanceDataUtil.getInstanceDataMap(instanceDataPO.getInstanceData());
             runtimeContext.setInstanceDataMap(currentInstanceDataMap);
         }
         runtimeContext.setCurrentNodeInstance(currentNodeInstance);
@@ -276,24 +278,24 @@ public abstract class ElementExecutor extends RuntimeExecutor {
         List<String> outgoingKeyList = currentFlowElement.getOutgoing();
         String nextElementKey = outgoingKeyList.get(0);
         FlowElement nextFlowElement = FlowModelUtil.getFlowElement(flowElementMap, nextElementKey);
-        while (nextFlowElement.getType() == FlowElementType.SEQUENCE_FLOW) {
+        while (FlowElementType.SEQUENCE_FLOW.equals(nextFlowElement.getType())) {
             nextFlowElement = getUniqueNextNode(nextFlowElement, flowElementMap);
         }
         return nextFlowElement;
     }
 
     protected FlowElement calculateNextNode(FlowElement currentFlowElement, Map<String, FlowElement> flowElementMap,
-                                            Map<String, InstanceData> instanceDataMap) throws ProcessException {
+                                            JSONObject instanceDataMap) throws ProcessException {
         FlowElement nextFlowElement = calculateOutgoing(currentFlowElement, flowElementMap, instanceDataMap);
 
-        while (nextFlowElement.getType() == FlowElementType.SEQUENCE_FLOW) {
+        while (FlowElementType.SEQUENCE_FLOW.equals(nextFlowElement.getType())) {
             nextFlowElement = getUniqueNextNode(nextFlowElement, flowElementMap);
         }
         return nextFlowElement;
     }
 
     private FlowElement calculateOutgoing(FlowElement flowElement, Map<String, FlowElement> flowElementMap,
-                                          Map<String, InstanceData> instanceDataMap) throws ProcessException {
+                                          JSONObject instanceDataMap) throws ProcessException {
         FlowElement defaultElement = null;
 
         List<String> outgoingList = flowElement.getOutgoing();
@@ -320,8 +322,7 @@ public abstract class ElementExecutor extends RuntimeExecutor {
         throw new ProcessException(ErrorEnum.GET_OUTGOING_FAILED);
     }
 
-    protected boolean processCondition(String expression, Map<String, InstanceData> instanceDataMap) throws ProcessException {
-        Map<String, Object> dataMap = InstanceDataUtil.parseInstanceDataMap(instanceDataMap);
-        return expressionCalculator.calculate(expression, dataMap);
+    protected boolean processCondition(String expression, JSONObject instanceDataMap) throws ProcessException {
+        return expressionCalculator.calculate(expression, instanceDataMap);
     }
 }

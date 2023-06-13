@@ -3,7 +3,7 @@ package com.nstop.flow.engine.common;
 public enum ErrorEnum {
 
     //1000~1999 非阻断性错误码
-    SUCCESS(1000, "Success"),
+    SUCCESS(0, "Success"),
     REENTRANT_WARNING(1001, "Reentrant warning"),
     COMMIT_SUSPEND(1002, "Commit task suspend"),
     ROLLBACK_SUSPEND(1003, "Rollback task suspend"),

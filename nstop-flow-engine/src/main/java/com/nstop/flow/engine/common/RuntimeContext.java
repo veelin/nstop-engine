@@ -1,8 +1,8 @@
 package com.nstop.flow.engine.common;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nstop.flow.engine.bo.NodeInstanceBO;
 import com.nstop.flow.engine.model.FlowElement;
-import com.nstop.flow.engine.model.InstanceData;
 import com.google.common.base.MoreObjects;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class RuntimeContext {
 
     //2.3 data info
     private String instanceDataId;
-    private Map<String, InstanceData> instanceDataMap;
+    private JSONObject instanceDataMap;
 
     //2.4 process status
     private int processStatus;
@@ -131,11 +131,19 @@ public class RuntimeContext {
         this.instanceDataId = instanceDataId;
     }
 
-    public Map<String, InstanceData> getInstanceDataMap() {
+    public JSONObject getInstanceDataMap() {
         return instanceDataMap;
     }
+//
+//    public JSONObject getRuntimeData() {
+//        return getInstanceDataMap().getJSONObject("runtimeData");
+//    }
+//
+//    public void setRuntimeData(JSONObject runtimeData) {
+//        getInstanceDataMap().put("runtimeData", runtimeData);
+//    }
 
-    public void setInstanceDataMap(Map<String, InstanceData> instanceDataMap) {
+    public void setInstanceDataMap(JSONObject instanceDataMap) {
         this.instanceDataMap = instanceDataMap;
     }
 

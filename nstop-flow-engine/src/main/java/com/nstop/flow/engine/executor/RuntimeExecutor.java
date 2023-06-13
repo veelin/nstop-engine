@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 
-public abstract class RuntimeExecutor {
+public abstract class RuntimeExecutor<Context extends RuntimeContext> {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(RuntimeExecutor.class);
 
@@ -36,15 +36,15 @@ public abstract class RuntimeExecutor {
         return idGenerator.getNextId();
     }
 
-    public abstract void execute(RuntimeContext runtimeContext) throws ProcessException;
+    public abstract void execute(Context runtimeContext) throws ProcessException;
 
-    public abstract void commit(RuntimeContext runtimeContext) throws ProcessException;
+    public abstract void commit(Context runtimeContext) throws ProcessException;
 
-    public abstract void rollback(RuntimeContext runtimeContext) throws ProcessException;
+    public abstract void rollback(Context runtimeContext) throws ProcessException;
 
-    protected abstract boolean isCompleted(RuntimeContext runtimeContext) throws ProcessException;
+    protected abstract boolean isCompleted(Context runtimeContext) throws ProcessException;
 
-    protected abstract RuntimeExecutor getExecuteExecutor(RuntimeContext runtimeContext) throws ProcessException;
+    protected abstract RuntimeExecutor getExecuteExecutor(Context runtimeContext) throws ProcessException;
 
-    protected abstract RuntimeExecutor getRollbackExecutor(RuntimeContext runtimeContext) throws ProcessException;
+    protected abstract RuntimeExecutor getRollbackExecutor(Context runtimeContext) throws ProcessException;
 }

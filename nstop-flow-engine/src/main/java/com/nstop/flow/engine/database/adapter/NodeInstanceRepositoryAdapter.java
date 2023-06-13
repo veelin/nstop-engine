@@ -19,7 +19,7 @@ public class NodeInstanceRepositoryAdapter {
     private NodeInstanceMemoryRepository nodeInstanceMemoryRepository;
 
     public NodeInstanceRepository find(RuntimeContext context){
-        String engineType = InstanceDataUtil.getStringValue(context.getInstanceDataMap(), Constants.ENGINE_TYPE_DATA_KEY);
+        String engineType = InstanceDataUtil.getStringValue(context.getInstanceDataMap(), Constants.SYSTEM_CONTEXT_PROPERTIES.ENGINE_TYPE_DATA_KEY);
         return find(engineType);
     }
 

@@ -12,8 +12,8 @@ public class TerminateResult extends RuntimeResult {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("errCode", getErrCode())
-                .add("errMsg", getErrMsg())
+                .add("errCode", getCode())
+                .add("errMsg", getMessage())
                 .toString();
     }
 }

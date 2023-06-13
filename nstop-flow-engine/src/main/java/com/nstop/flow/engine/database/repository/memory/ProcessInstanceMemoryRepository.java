@@ -14,7 +14,7 @@ public class ProcessInstanceMemoryRepository implements ProcessInstanceRepositor
 
     @Override
     public int insert(FlowInstancePO flowInstancePO) {
-        return 0;
+        return 1;
     }
 
     @Override

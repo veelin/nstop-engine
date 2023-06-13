@@ -5,39 +5,39 @@ import com.google.common.base.MoreObjects;
 
 public class CommonResult {
 
-    private int errCode;
-    private String errMsg;
+    private int code;
+    private String message;
 
     public CommonResult() {
         super();
     }
 
     public CommonResult(ErrorEnum errorEnum) {
-        this.errCode = errorEnum.getErrNo();
-        this.errMsg = errorEnum.getErrMsg();
+        this.code = errorEnum.getErrNo();
+        this.message = errorEnum.getErrMsg();
     }
 
-    public int getErrCode() {
-        return errCode;
+    public int getCode() {
+        return code;
     }
 
-    public void setErrCode(int errCode) {
-        this.errCode = errCode;
+    public void setCode(int code) {
+        this.code = code;
     }
 
-    public String getErrMsg() {
-        return errMsg;
+    public String getMessage() {
+        return message;
     }
 
-    public void setErrMsg(String errMsg) {
-        this.errMsg = errMsg;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("errCode", errCode)
-                .add("errMsg", errMsg)
+                .add("code", code)
+                .add("message", message)
                 .toString();
     }
 }

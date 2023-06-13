@@ -1,5 +1,6 @@
 package com.nstop.flow.engine.executor;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nstop.flow.engine.bo.NodeInstanceBO;
 import com.nstop.flow.engine.database.adapter.ProcessInstanceRepositoryAdapter;
 import com.nstop.flow.engine.database.repository.InstanceDataRepository;
@@ -13,7 +14,6 @@ import com.nstop.flow.engine.entity.NodeInstancePO;
 import com.nstop.flow.engine.exception.ProcessException;
 import com.nstop.flow.engine.exception.ReentrantException;
 import com.nstop.flow.engine.model.FlowElement;
-import com.nstop.flow.engine.model.InstanceData;
 import com.nstop.flow.engine.util.FlowModelUtil;
 import com.nstop.flow.engine.util.InstanceDataUtil;
 import com.google.common.collect.Lists;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class FlowExecutor extends RuntimeExecutor {
+public class FlowExecutor extends RuntimeExecutor<RuntimeContext> {
 
     @Resource
     private ProcessInstanceRepositoryAdapter processInstanceRepositoryAdapter;
@@ -98,7 +98,7 @@ public class FlowExecutor extends RuntimeExecutor {
         return flowInstancePO;
     }
 
-    private String saveInstanceData(RuntimeContext runtimeContext, FlowInstancePO flowInstancePO, Map<String, InstanceData> instanceDataMap) throws ProcessException {
+    private String saveInstanceData(RuntimeContext runtimeContext, FlowInstancePO flowInstancePO, JSONObject instanceDataMap) throws ProcessException {
         if (MapUtils.isEmpty(instanceDataMap)) {
             return StringUtils.EMPTY;
         }
@@ -114,7 +114,7 @@ public class FlowExecutor extends RuntimeExecutor {
         throw new ProcessException(ErrorEnum.SAVE_INSTANCE_DATA_FAILED);
     }
 
-    private InstanceDataPO buildInstanceDataPO(FlowInstancePO flowInstancePO, Map<String, InstanceData> instanceDataMap) {
+    private InstanceDataPO buildInstanceDataPO(FlowInstancePO flowInstancePO, JSONObject instanceDataMap) {
         InstanceDataPO instanceDataPO = new InstanceDataPO();
         // copy flow info & flowInstanceId
         BeanUtils.copyProperties(flowInstancePO, instanceDataPO);
@@ -245,10 +245,10 @@ public class FlowExecutor extends RuntimeExecutor {
             suspendNodeInstance.setStatus(nodeInstancePO.getStatus());
             throw new ReentrantException(ErrorEnum.REENTRANT_WARNING);
         }
-        Map<String, InstanceData> instanceDataMap;
+        JSONObject instanceDataMap;
         String instanceDataId = nodeInstancePO.getInstanceDataId();
         if (StringUtils.isBlank(instanceDataId)) {
-            instanceDataMap = Maps.newHashMap();
+            instanceDataMap = new JSONObject();
         } else {
             InstanceDataPO instanceDataPO = instanceDataRepository.select(flowInstanceId, instanceDataId);
             if (instanceDataPO == null) {
@@ -260,7 +260,7 @@ public class FlowExecutor extends RuntimeExecutor {
         }
 
         //2.merge data while commitDataMap is not empty
-        Map<String, InstanceData> commitDataMap = runtimeContext.getInstanceDataMap();
+       JSONObject commitDataMap = runtimeContext.getInstanceDataMap();
         if (MapUtils.isNotEmpty(commitDataMap)) {
             instanceDataId = genId();
             instanceDataMap.putAll(commitDataMap);
@@ -275,7 +275,7 @@ public class FlowExecutor extends RuntimeExecutor {
     }
 
     private InstanceDataPO buildCommitInstanceData(RuntimeContext runtimeContext, String nodeInstanceId, String nodeKey,
-                                                   String newInstanceDataId, Map<String, InstanceData> instanceDataMap) {
+                                                   String newInstanceDataId, JSONObject instanceDataMap) {
         InstanceDataPO instanceDataPO = new InstanceDataPO();
         BeanUtils.copyProperties(runtimeContext, instanceDataPO);
 
@@ -291,7 +291,7 @@ public class FlowExecutor extends RuntimeExecutor {
     }
 
     private void fillCommitContext(RuntimeContext runtimeContext, NodeInstancePO nodeInstancePO, String instanceDataId,
-                                   Map<String, InstanceData> instanceDataMap) throws ProcessException {
+                                   JSONObject instanceDataMap) throws ProcessException {
 
         runtimeContext.setInstanceDataId(instanceDataId);
         runtimeContext.setInstanceDataMap(instanceDataMap);
@@ -378,9 +378,9 @@ public class FlowExecutor extends RuntimeExecutor {
 
         //3.get instanceData
         String instanceDataId = rollbackNodeInstancePO.getInstanceDataId();
-        Map<String, InstanceData> instanceDataMap;
+        JSONObject instanceDataMap;
         if (StringUtils.isBlank(instanceDataId)) {
-            instanceDataMap = Maps.newHashMap();
+            instanceDataMap = new JSONObject();
         } else {
             InstanceDataRepository instanceDataRepository = instanceDataRepositoryAdapter.find(runtimeContext);
             InstanceDataPO instanceDataPO = instanceDataRepository.select(flowInstanceId, instanceDataId);
@@ -472,7 +472,7 @@ public class FlowExecutor extends RuntimeExecutor {
     }
 
     private void fillRollbackContext(RuntimeContext runtimeContext, NodeInstancePO nodeInstancePO,
-                                     Map<String, InstanceData> instanceDataMap) throws ProcessException {
+                                     JSONObject instanceDataMap) throws ProcessException {
         runtimeContext.setInstanceDataId(nodeInstancePO.getInstanceDataId());
         runtimeContext.setInstanceDataMap(instanceDataMap);
         runtimeContext.setNodeInstanceList(Lists.newArrayList());
@@ -527,7 +527,8 @@ public class FlowExecutor extends RuntimeExecutor {
 
         String nodeKey = suspendNodeInstance.getNodeKey();
         Map<String, FlowElement> flowElementMap = runtimeContext.getFlowElementMap();
-        if (FlowModelUtil.getFlowElement(flowElementMap, nodeKey).getType() == FlowElementType.END_EVENT) {
+        if (FlowModelUtil.getFlowElement(flowElementMap, nodeKey).getType().equals(FlowElementType.END_EVENT)
+            || FlowModelUtil.getFlowElement(flowElementMap, nodeKey).getType().equals(FlowElementType.HTTP_END_EVENT)) {
             return true;
         }
         return false;

@@ -34,7 +34,7 @@ public class ElementValidatorFactory {
     private ExclusiveGatewayValidator exclusiveGatewayValidator;
 
     public ElementValidator getElementValidator(FlowElement flowElement) throws ProcessException {
-        int elementType = flowElement.getType();
+        String elementType = flowElement.getType();
         ElementValidator elementValidator = getElementValidator(elementType);
 
         if (elementValidator == null) {
@@ -46,15 +46,21 @@ public class ElementValidatorFactory {
         return elementValidator;
     }
 
-    private ElementValidator getElementValidator(int elementType) {
+    private ElementValidator getElementValidator(String elementType) {
         switch (elementType) {
             case FlowElementType.START_EVENT:
+            case FlowElementType.HTTP_START_EVENT:
                 return startEventValidator;
             case FlowElementType.END_EVENT:
+            case FlowElementType.HTTP_END_EVENT:
                 return endEventValidator;
             case FlowElementType.SEQUENCE_FLOW:
                 return sequenceFlowValidator;
             case FlowElementType.USER_TASK:
+            case FlowElementType.GROOVY:
+            case FlowElementType.JAVA_INVOKER:
+            case FlowElementType.RDB:
+            case FlowElementType.EXCEPTION:
                 return userTaskValidator;
             case FlowElementType.EXCLUSIVE_GATEWAY:
                 return exclusiveGatewayValidator;

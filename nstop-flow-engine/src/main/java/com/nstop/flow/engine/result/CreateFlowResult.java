@@ -16,8 +16,8 @@ public class CreateFlowResult extends CommonResult {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("errCode", getErrCode())
-                .add("errMsg", getErrMsg())
+                .add("errCode", getCode())
+                .add("errMsg", getMessage())
                 .add("flowModuleId", flowModuleId)
                 .toString();
     }

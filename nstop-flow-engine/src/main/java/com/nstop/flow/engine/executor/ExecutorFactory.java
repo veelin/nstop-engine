@@ -32,10 +32,24 @@ public class ExecutorFactory {
 
     @Resource
     private ExclusiveGatewayExecutor exclusiveGatewayExecutor;
+    @Resource
+    private GroovyExecutor groovyExecutor;
 
+    @Resource
+    private HttpStartEventExecutor httpStartEventExecutor;
+
+    @Resource
+    private HttpEndEventExecutor httpEndEventExecutor;
+
+    @Resource
+    private JavaInvokerExecutor javaInvokerExecutor;
+    @Resource
+    private RdbEventExecutor rdbEventExecutor;
+    @Resource
+    private ExceptionEventExecutor exceptionEventExecutor;
 
     public ElementExecutor getElementExecutor(FlowElement flowElement) throws ProcessException {
-        int elementType = flowElement.getType();
+        String elementType = flowElement.getType();
         ElementExecutor elementExecutor = getElementExecutor(elementType);
 
         if (elementExecutor == null) {
@@ -48,14 +62,32 @@ public class ExecutorFactory {
         return elementExecutor;
     }
 
-    private ElementExecutor getElementExecutor(int elementType) {
+    private ElementExecutor getElementExecutor(String elementType) {
         switch (elementType) {
-            case FlowElementType.START_EVENT: return startEventExecutor;
-            case FlowElementType.END_EVENT: return endEventExecutor;
-            case FlowElementType.SEQUENCE_FLOW: return sequenceFlowExecutor;
-            case FlowElementType.USER_TASK: return userTaskExecutor;
-            case FlowElementType.EXCLUSIVE_GATEWAY: return exclusiveGatewayExecutor;
-            default: return null;
+            case FlowElementType.START_EVENT:
+                return startEventExecutor;
+            case FlowElementType.END_EVENT:
+                return endEventExecutor;
+            case FlowElementType.SEQUENCE_FLOW:
+                return sequenceFlowExecutor;
+            case FlowElementType.USER_TASK:
+                return userTaskExecutor;
+            case FlowElementType.EXCLUSIVE_GATEWAY:
+                return exclusiveGatewayExecutor;
+            case FlowElementType.GROOVY:
+                return groovyExecutor;
+            case FlowElementType.HTTP_START_EVENT:
+                return httpStartEventExecutor;
+            case FlowElementType.HTTP_END_EVENT:
+                return httpEndEventExecutor;
+            case FlowElementType.JAVA_INVOKER:
+                return javaInvokerExecutor;
+            case FlowElementType.RDB:
+                return rdbEventExecutor;
+            case FlowElementType.EXCEPTION:
+                return exceptionEventExecutor;
+            default:
+                return null;
         }
     }
 }

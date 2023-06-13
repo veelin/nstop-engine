@@ -9,6 +9,7 @@ public class FlowDefinitionPO extends OperationPO {
     private String flowKey;
     private String flowModel;
     private Integer status;
+    private String flowType;
 
     public String getFlowModuleId() {
         return flowModuleId;
@@ -49,4 +50,13 @@ public class FlowDefinitionPO extends OperationPO {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
+
 }

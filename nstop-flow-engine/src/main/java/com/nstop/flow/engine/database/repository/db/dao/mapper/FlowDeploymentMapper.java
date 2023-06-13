@@ -12,4 +12,10 @@ public interface FlowDeploymentMapper extends BaseMapper<FlowDeploymentPO> {
 
     @Select("SELECT * FROM em_flow_deployment WHERE flow_module_id=#{flowModuleId} ORDER BY id DESC LIMIT 1")
     FlowDeploymentPO selectByModuleId(@Param("flowModuleId") String flowModuleId);
+
+    @Select("SELECT * FROM em_flow_deployment WHERE flow_type=#{flowType}  ORDER BY id DESC LIMIT 1")
+    FlowDeploymentPO selectByFlowType(@Param("flowType") String flowType);
+
+    @Select("SELECT * FROM em_flow_deployment WHERE  flow_type=#{flowType} and flow_key=#{flowKey} ORDER BY id DESC LIMIT 1")
+    FlowDeploymentPO selectByFlowKey(@Param("flowType") String flowType, @Param("flowKey") String flowKey);
 }
