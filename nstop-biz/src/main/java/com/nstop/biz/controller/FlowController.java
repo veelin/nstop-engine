@@ -47,7 +47,7 @@ public class FlowController {
         String requestBodyString = getRequestBody(request);
         StartProcessParam startProcessParam = new StartProcessParam();
         startProcessParam.setFlowModuleId(flowModule.getFlowModuleId());
-        JSONObject jsonObject = Optional.of(JSON.parseObject(requestBodyString)).orElse(new JSONObject());
+        JSONObject jsonObject = Optional.ofNullable(JSON.parseObject(requestBodyString)).orElse(new JSONObject());
         startProcessParam.setVariables(jsonObject);
         InstanceDataUtil.putValue(startProcessParam.getVariables(), Constants.SYSTEM_CONTEXT_PROPERTIES.ENGINE_TYPE_DATA_KEY, EngineTypeEnum.instant.name());
         StartProcessResult startProcessResult = turboProcessEngine.startProcess(startProcessParam);
@@ -73,7 +73,7 @@ public class FlowController {
         FlowModuleResult flowModule = getFlowModuleByPath(path, isDebug);
         StartProcessParam startProcessParam = new StartProcessParam();
         startProcessParam.setFlowModuleId(flowModule.getFlowModuleId());
-        JSONObject jsonObject = Optional.of(JSON.parseObject(requestBody)).orElse(new JSONObject());
+        JSONObject jsonObject = Optional.ofNullable(JSON.parseObject(requestBody)).orElse(new JSONObject());
         startProcessParam.setVariables(jsonObject);
         InstanceDataUtil.putValue(startProcessParam.getVariables(), Constants.SYSTEM_CONTEXT_PROPERTIES.ENGINE_TYPE_DATA_KEY, EngineTypeEnum.instant.name());
         return startProcessParam;
