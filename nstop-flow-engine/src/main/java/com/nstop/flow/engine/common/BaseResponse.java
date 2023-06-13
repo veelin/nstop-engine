@@ -1,7 +1,6 @@
-package com.nstop.biz.controller.pojo.response;
+package com.nstop.flow.engine.common;
 
 
-import com.nstop.flow.engine.common.ErrorEnum;
 
 /**
  * @Author: james zhangxiao
@@ -14,6 +13,11 @@ public class BaseResponse<T> {
     String message;
     T data;
 
+
+    public BaseResponse(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 
     public BaseResponse(ErrorEnum errorEnum) {
         this.code = errorEnum.getErrNo();

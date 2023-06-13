@@ -527,7 +527,8 @@ public class FlowExecutor extends RuntimeExecutor<RuntimeContext> {
 
         String nodeKey = suspendNodeInstance.getNodeKey();
         Map<String, FlowElement> flowElementMap = runtimeContext.getFlowElementMap();
-        if (FlowModelUtil.getFlowElement(flowElementMap, nodeKey).getType().equals(FlowElementType.END_EVENT)) {
+        if (FlowModelUtil.getFlowElement(flowElementMap, nodeKey).getType().equals(FlowElementType.END_EVENT)
+            || FlowModelUtil.getFlowElement(flowElementMap, nodeKey).getType().equals(FlowElementType.HTTP_END_EVENT)) {
             return true;
         }
         return false;

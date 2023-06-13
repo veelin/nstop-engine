@@ -61,7 +61,8 @@ public class FlowModelValidator {
                 startEventCount++;
             }
 
-            if (FlowElementType.END_EVENT.equals(flowElement.getType())) {
+            if (FlowElementType.END_EVENT.equals(flowElement.getType())
+                    ||FlowElementType.HTTP_END_EVENT.equals(flowElement.getType())) {
                 endEventCount++;
             }
         }

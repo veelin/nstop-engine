@@ -32,10 +32,6 @@ public class ElementValidatorFactory {
 
     @Resource
     private ExclusiveGatewayValidator exclusiveGatewayValidator;
-    @Resource
-    private GroovyValidator groovyValidator;
-    @Resource
-    private HttpStartEventValidator httpStartEventValidator;
 
     public ElementValidator getElementValidator(FlowElement flowElement) throws ProcessException {
         String elementType = flowElement.getType();
@@ -53,19 +49,21 @@ public class ElementValidatorFactory {
     private ElementValidator getElementValidator(String elementType) {
         switch (elementType) {
             case FlowElementType.START_EVENT:
+            case FlowElementType.HTTP_START_EVENT:
                 return startEventValidator;
             case FlowElementType.END_EVENT:
+            case FlowElementType.HTTP_END_EVENT:
                 return endEventValidator;
             case FlowElementType.SEQUENCE_FLOW:
                 return sequenceFlowValidator;
             case FlowElementType.USER_TASK:
+            case FlowElementType.GROOVY:
+            case FlowElementType.JAVA_INVOKER:
+            case FlowElementType.RDB:
+            case FlowElementType.EXCEPTION:
                 return userTaskValidator;
             case FlowElementType.EXCLUSIVE_GATEWAY:
                 return exclusiveGatewayValidator;
-            case FlowElementType.GROOVY:
-                return groovyValidator;
-            case FlowElementType.HTTP_START_EVENT:
-                return httpStartEventValidator;
             default:
                 return null;
         }

@@ -1,19 +1,9 @@
 spring:
-  datasource:
-    dynamic:
-      primary: engine
-      datasource:
-        engine:
-          type: com.alibaba.druid.pool.DruidDataSource
-          username: sweet
-          password: mesCAV4oY7y90qt7D1eWRrwwxU0IeHb!
-          driver-class-name: com.mysql.jdbc.Driver
-          url: jdbc:mysql://127.0.0.1:3306/t_engine?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&autoReconnect=true
   main:
     allow-bean-definition-overriding: true
 mybatis:
   configuration:
-    map-underscore-to-camel-case: true
+    mapUnderscoreToCamelCase: true
 logging:
   config: logback-spring.xml
 hook:
@@ -22,14 +12,14 @@ hook:
 
 nstop-engine:
   datasource:
-    mysql:
-      db1:
+    rdb:
+      sys:
         type: com.alibaba.druid.pool.DruidDataSource
         username: sweet
         password: mesCAV4oY7y90qt7D1eWRrwwxU0IeHb!
         driver-class-name: com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/t_engine?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&autoReconnect=true
-      db2:
+      db1:
         type: com.alibaba.druid.pool.DruidDataSource
         username: sweet
         password: mesCAV4oY7y90qt7D1eWRrwwxU0IeHb!

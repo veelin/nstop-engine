@@ -112,7 +112,6 @@ public class DefinitionProcessor {
                 LOGGER.warn("deploy flow failed: flow is not editing status.||deployFlowParam={}", deployFlowParam);
                 throw new DefinitionException(ErrorEnum.FLOW_NOT_EDITING);
             }
-
             String flowModel = flowDefinitionPO.getFlowModel();
             modelValidator.validate(flowModel);
 
@@ -149,7 +148,7 @@ public class DefinitionProcessor {
             } else if (StringUtils.isNotBlank(getFlowModuleParam.getFlowModuleId())) {
                 flowModuleResult = getFlowModuleByFlowModuleId(flowModuleId);
             } else {
-                flowModuleResult = getFlowModuleByFlowType(getFlowModuleParam.getFlowType(), getFlowModuleParam.getFlowKey(), getFlowModuleParam.isDebug());
+                flowModuleResult = getFlowModuleByFlowKey(getFlowModuleParam.getFlowType(), getFlowModuleParam.getFlowKey(), getFlowModuleParam.isDebug());
             }
             fillCommonResult(flowModuleResult, ErrorEnum.SUCCESS);
         } catch (TurboException te) {
@@ -186,11 +185,11 @@ public class DefinitionProcessor {
         return flowModuleResult;
     }
 
-    private FlowModuleResult getFlowModuleByFlowType(String flowType, String flowKey, boolean isDebug) throws ParamException {
+    private FlowModuleResult getFlowModuleByFlowKey(String flowType, String flowKey, boolean isDebug) throws ParamException {
         FlowModuleResult flowModuleResult = new FlowModuleResult();
 
         if (!isDebug) {
-            FlowDeploymentPO flowDeploymentPO = flowDeploymentDAO.selectRecentByFlowType(flowType, flowKey);
+            FlowDeploymentPO flowDeploymentPO = flowDeploymentDAO.selectRecentByFlowKey(flowType, flowKey);
             if (flowDeploymentPO == null) {
                 LOGGER.warn("getFlowModuleByFlowDeployId failed: can not find flowDefinitionPO.||flowType={}||flowKey={}", flowType, flowKey);
                 throw new ParamException(ErrorEnum.PARAM_INVALID.getErrNo(), "flowDefinitionPO is not exist");

@@ -38,6 +38,15 @@ public class ExecutorFactory {
     @Resource
     private HttpStartEventExecutor httpStartEventExecutor;
 
+    @Resource
+    private HttpEndEventExecutor httpEndEventExecutor;
+
+    @Resource
+    private JavaInvokerExecutor javaInvokerExecutor;
+    @Resource
+    private RdbEventExecutor rdbEventExecutor;
+    @Resource
+    private ExceptionEventExecutor exceptionEventExecutor;
 
     public ElementExecutor getElementExecutor(FlowElement flowElement) throws ProcessException {
         String elementType = flowElement.getType();
@@ -55,14 +64,30 @@ public class ExecutorFactory {
 
     private ElementExecutor getElementExecutor(String elementType) {
         switch (elementType) {
-            case FlowElementType.START_EVENT: return startEventExecutor;
-            case FlowElementType.END_EVENT: return endEventExecutor;
-            case FlowElementType.SEQUENCE_FLOW: return sequenceFlowExecutor;
-            case FlowElementType.USER_TASK: return userTaskExecutor;
-            case FlowElementType.EXCLUSIVE_GATEWAY: return exclusiveGatewayExecutor;
-            case FlowElementType.GROOVY: return groovyExecutor;
-            case FlowElementType.HTTP_START_EVENT: return httpStartEventExecutor;
-            default: return null;
+            case FlowElementType.START_EVENT:
+                return startEventExecutor;
+            case FlowElementType.END_EVENT:
+                return endEventExecutor;
+            case FlowElementType.SEQUENCE_FLOW:
+                return sequenceFlowExecutor;
+            case FlowElementType.USER_TASK:
+                return userTaskExecutor;
+            case FlowElementType.EXCLUSIVE_GATEWAY:
+                return exclusiveGatewayExecutor;
+            case FlowElementType.GROOVY:
+                return groovyExecutor;
+            case FlowElementType.HTTP_START_EVENT:
+                return httpStartEventExecutor;
+            case FlowElementType.HTTP_END_EVENT:
+                return httpEndEventExecutor;
+            case FlowElementType.JAVA_INVOKER:
+                return javaInvokerExecutor;
+            case FlowElementType.RDB:
+                return rdbEventExecutor;
+            case FlowElementType.EXCEPTION:
+                return exceptionEventExecutor;
+            default:
+                return null;
         }
     }
 }

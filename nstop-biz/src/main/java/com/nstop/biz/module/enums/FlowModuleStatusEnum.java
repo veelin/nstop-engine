@@ -1,4 +1,4 @@
-package com.nstop.biz.controller.enums;
+package com.nstop.biz.module.enums;
 
 /**
  * @Author: james zhangxiao

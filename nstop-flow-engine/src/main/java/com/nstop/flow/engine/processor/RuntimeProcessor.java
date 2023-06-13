@@ -138,8 +138,10 @@ public class RuntimeProcessor {
     }
 
     private RuntimeContext buildDebugProcessContext(FlowInfo flowInfo, JSONObject variables) {
+        if (variables == null){
+            variables = new JSONObject();
+        }
         RuntimeContext runtimeContext = buildRuntimeContext(flowInfo, variables);
-        InstanceDataUtil.putValue(runtimeContext.getInstanceDataMap(), Constants.ENGINE_TYPE_DATA_KEY, EngineTypeEnum.instant.name());
         return runtimeContext;
     }
 
@@ -160,7 +162,7 @@ public class RuntimeProcessor {
         BeanUtils.copyProperties(runtimeContext, debugResult);
         if (e != null) {
             debugResult.setCode(ErrorEnum.SYSTEM_ERROR.getErrNo());
-            debugResult.setMessage(ErrorEnum.SYSTEM_ERROR.getErrMsg());
+            debugResult.setMessage(e.getMessage());
         }else {
             debugResult.setCode(ErrorEnum.SUCCESS.getErrNo());
             debugResult.setMessage(ErrorEnum.SUCCESS.getErrMsg());

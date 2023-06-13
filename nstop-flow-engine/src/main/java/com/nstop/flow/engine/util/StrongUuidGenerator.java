@@ -8,6 +8,8 @@ public final class StrongUuidGenerator implements IdGenerator {
 
     private static volatile TimeBasedGenerator timeBasedGenerator;
 
+    public static final IdGenerator idGenerator = new StrongUuidGenerator();
+
     public StrongUuidGenerator() {
         initGenerator();
     }

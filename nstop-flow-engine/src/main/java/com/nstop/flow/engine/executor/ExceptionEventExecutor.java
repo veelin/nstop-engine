@@ -1,43 +1,38 @@
 package com.nstop.flow.engine.executor;
 
+import com.alibaba.fastjson.JSON;
 import com.nstop.flow.engine.bo.NodeInstanceBO;
 import com.nstop.flow.engine.common.Constants;
+import com.nstop.flow.engine.common.ErrorEnum;
 import com.nstop.flow.engine.common.NodeInstanceStatus;
 import com.nstop.flow.engine.common.RuntimeContext;
-import com.nstop.flow.engine.config.HookProperties;
 import com.nstop.flow.engine.exception.ProcessException;
+import com.nstop.flow.engine.exception.TurboException;
 import com.nstop.flow.engine.model.FlowElement;
-import com.nstop.flow.engine.util.GroovyUtil;
+import com.nstop.flow.engine.util.ApplicationContextHolder;
 import com.nstop.flow.engine.util.InstanceDataUtil;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
 
 @Service
-public class GroovyExecutor extends ElementExecutor {
+public class ExceptionEventExecutor extends ElementExecutor {
 
-    /**
-     * Update data map: http request to update data map
-     * Url: dynamic config
-     * Param: one of flowElement's properties
-     */
     @Override
     protected void doExecute(RuntimeContext runtimeContext) throws ProcessException {
         FlowElement flowElement = runtimeContext.getCurrentNodeModel();
 
-        String script = (String) flowElement.getProperties().get(Constants.ELEMENT_PROPERTIES.SCRIPT);
-        Boolean joinContext = (Boolean) flowElement.getProperties().get(Constants.ELEMENT_PROPERTIES._joinContext);
-        String contextName = (String) flowElement.getProperties().get(Constants.ELEMENT_PROPERTIES._contextName);
+        String _errorCode = (String) flowElement.getProperties().get(Constants.ELEMENT_PROPERTIES._errorCode);
+        String _errorMsg = (String) flowElement.getProperties().get(Constants.ELEMENT_PROPERTIES._errorMsg);
 
-        try {
-            Object execute = GroovyUtil.execute(script, runtimeContext.getInstanceDataMap());
-            if (joinContext!= null && joinContext) {
-                InstanceDataUtil.putValue(runtimeContext.getInstanceDataMap(), contextName, execute);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+        int errorCode = StringUtils.isBlank(_errorCode) ? ErrorEnum.SYSTEM_ERROR.getErrNo(): Integer.valueOf(_errorCode);
+        InstanceDataUtil.putValue(runtimeContext.getInstanceDataMap(), Constants.SYSTEM_CONTEXT_PROPERTIES.ERROR_CODE, errorCode);
+        InstanceDataUtil.putValue(runtimeContext.getInstanceDataMap(), Constants.SYSTEM_CONTEXT_PROPERTIES.ERROR_MSG, _errorMsg);
+        InstanceDataUtil.putValue(runtimeContext.getInstanceDataMap(), Constants.SYSTEM_CONTEXT_PROPERTIES.HAS_ERROR, true);
     }
 
 
@@ -65,4 +60,5 @@ public class GroovyExecutor extends ElementExecutor {
         runtimeContext.setCurrentNodeModel(nextNode);
         return executorFactory.getElementExecutor(nextNode);
     }
+
 }
