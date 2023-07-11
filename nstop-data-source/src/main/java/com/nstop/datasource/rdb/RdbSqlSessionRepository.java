@@ -1,7 +1,9 @@
 package com.nstop.datasource.rdb;
 
+import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +22,21 @@ public class RdbSqlSessionRepository {
     private static Map<String, SqlSessionTemplate> sqlSessionTemplateMap = new HashMap<>();
     private static Map<String, SqlSessionFactory> sqlSessionFactoryMap = new HashMap<>();
 
-    public SqlSessionTemplate getTemplateByName(String name){
+    public SqlSessionTemplate getTemplateByName(String name) {
         return sqlSessionTemplateMap.get(name);
     }
 
-    public SqlSessionFactory getFactoryByName(String name){
+    public SqlSessionFactory getFactoryByName(String name) {
         return sqlSessionFactoryMap.get(name);
     }
 
 
-    public void initSingleSqlSessionTemplate(String name, DataSource dataSource, Configuration configuration) throws Exception {
+    public void initSingleSqlSessionTemplate(String name, DataSource dataSource) throws Exception {
 
+        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+        configuration.setEnvironment(new Environment("nstop_" + name, new JdbcTransactionFactory(), dataSource));
+        configuration.setLogImpl(org.apache.ibatis.logging.stdout.StdOutImpl.class);
+        configuration.setMapUnderscoreToCamelCase(true);
 
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource);

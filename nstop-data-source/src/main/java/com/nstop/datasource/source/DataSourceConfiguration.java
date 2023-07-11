@@ -31,8 +31,6 @@ public class DataSourceConfiguration {
 
     private final DataSourceProperties dataSourceProperties;
 
-    @Autowired
-    private org.apache.ibatis.session.Configuration nstopMybatisConfig;
 
     @Autowired
     private RdbDataSourceRepository rdbDataSourceRepository;
@@ -45,7 +43,7 @@ public class DataSourceConfiguration {
     @PostConstruct
     public void init() throws Exception {
         initDataSource(rdbDataSourceRepository);
-        initSqlSessionTemplate(rdbDataSourceRepository, rdbSqlSessionRepository, nstopMybatisConfig);
+        initSqlSessionTemplate(rdbDataSourceRepository, rdbSqlSessionRepository);
     }
 
     private void initDataSource(RdbDataSourceRepository dataSourceRepository){
@@ -80,11 +78,11 @@ public class DataSourceConfiguration {
         }
     }
 
-    private void initSqlSessionTemplate(RdbDataSourceRepository rdbDataSourceRepository, RdbSqlSessionRepository rdbSqlSessionRepository, org.apache.ibatis.session.Configuration configuration) throws Exception {
+    private void initSqlSessionTemplate(RdbDataSourceRepository rdbDataSourceRepository, RdbSqlSessionRepository rdbSqlSessionRepository) throws Exception {
             Map<String, DataSource> allDatasource = rdbDataSourceRepository.getAllDatasource();
             if (!CollectionUtils.isEmpty(allDatasource)) {
                 for (Map.Entry<String, DataSource> dataSourceEntry : allDatasource.entrySet()) {
-                    rdbSqlSessionRepository.initSingleSqlSessionTemplate(dataSourceEntry.getKey(), dataSourceEntry.getValue(), configuration);
+                    rdbSqlSessionRepository.initSingleSqlSessionTemplate(dataSourceEntry.getKey(), dataSourceEntry.getValue());
                 }
             }
     }

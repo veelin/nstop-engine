@@ -26,7 +26,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <nstop.version>1.0-SNAPSHOT</nstop.version>
+        <nstop.version>1.0.1-SNAPSHOT</nstop.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot-starter.version>2.7.6</spring-boot-starter.version>
         <druid.version>1.1.20</druid.version>
